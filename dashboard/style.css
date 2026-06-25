@@ -657,4 +657,37 @@ input:checked + .slider:before {
   transform: translateX(28px);
 }
 
+/* Outside Local Weather Widget Styles */
+.icon-weather {
+  color: var(--color-cyan);
+  transition: all 0.3s ease;
+}
+
+.weather-details {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.detail-item i {
+  font-size: 0.95rem;
+  color: var(--color-cyan);
+}
+
+#val-outside-location {
+  font-weight: 600;
+  color: var(--color-cyan);
+}
+
 

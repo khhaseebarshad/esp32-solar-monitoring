@@ -39,6 +39,8 @@ firebase.auth().signInAnonymously()
     console.log("Logged in to Firebase anonymously.");
     initChart(); // Initialize Chart.js
     setupRealtimeListeners();
+    fetchOutsideWeather(); // Fetch outside weather on load
+    setInterval(fetchOutsideWeather, 600000); // Refresh every 10 mins
   })
   .catch((error) => {
     console.error("Firebase Anonymous Auth failed:", error);
@@ -433,4 +435,87 @@ function triggerSyncAnimation() {
       syncIcon.classList.remove("active");
     }
   }, 600);
+}
+
+// ==========================================
+// 8. Outside Local Weather Fetching
+// ==========================================
+function fetchOutsideWeather() {
+  const weatherDesc = document.getElementById("desc-weather");
+  if (weatherDesc) weatherDesc.textContent = "Updating weather...";
+
+  // Detect location via free IP-based geolocation
+  fetch("https://ipapi.co/json/")
+    .then(res => res.json())
+    .then(geoData => {
+      const lat = geoData.latitude || 31.5204;
+      const lon = geoData.longitude || 74.3587;
+      const city = geoData.city ? `${geoData.city}, ${geoData.country_code}` : "Lahore, PK";
+      getWeatherData(lat, lon, city);
+    })
+    .catch(err => {
+      console.warn("IP Geolocation failed. Falling back to default (Lahore, PK):", err);
+      getWeatherData(31.5204, 74.3587, "Lahore, PK");
+    });
+}
+
+function getWeatherData(lat, lon, cityName) {
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code`;
+  
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.current) {
+        const temp = data.current.temperature_2m;
+        const hum = data.current.relative_humidity_2m;
+        const code = data.current.weather_code;
+        
+        const tempEl = document.getElementById("val-outside-temp");
+        const humEl = document.getElementById("val-outside-hum");
+        const locEl = document.getElementById("val-outside-location");
+        const descEl = document.getElementById("desc-weather");
+        const weatherIcon = document.getElementById("weather-icon");
+
+        if (tempEl) tempEl.textContent = temp.toFixed(1);
+        if (humEl) humEl.textContent = `${hum}%`;
+        if (locEl) locEl.textContent = cityName;
+        
+        // Map weather code
+        const weatherInfo = mapWeatherCode(code);
+        if (descEl) descEl.textContent = weatherInfo.text;
+        
+        if (weatherIcon) {
+          weatherIcon.className = `fa-solid ${weatherInfo.icon} icon-weather`;
+          weatherIcon.style.animation = weatherInfo.animation;
+        }
+      }
+    })
+    .catch(err => {
+      console.error("Error fetching weather from Open-Meteo:", err);
+      const descEl = document.getElementById("desc-weather");
+      if (descEl) descEl.textContent = "Failed to load weather";
+    });
+}
+
+function mapWeatherCode(code) {
+  // WMO Weather Codes (https://open-meteo.com/en/docs)
+  if (code === 0) {
+    return { text: "Clear Sky", icon: "fa-sun", animation: "glow-pulse 2s infinite alternate" };
+  } else if (code >= 1 && code <= 3) {
+    return { text: "Partly Cloudy", icon: "fa-cloud-sun", animation: "none" };
+  } else if (code === 45 || code === 48) {
+    return { text: "Foggy Weather", icon: "fa-smog", animation: "none" };
+  } else if (code >= 51 && code <= 55) {
+    return { text: "Light Drizzle", icon: "fa-cloud-rain", animation: "none" };
+  } else if (code >= 61 && code <= 65) {
+    return { text: "Rainy Weather", icon: "fa-cloud-showers-heavy", animation: "none" };
+  } else if (code >= 71 && code <= 77) {
+    return { text: "Snowy Weather", icon: "fa-snowflake", animation: "none" };
+  } else if (code >= 80 && code <= 82) {
+    return { text: "Rain Showers", icon: "fa-cloud-sun-rain", animation: "none" };
+  } else if (code >= 95 && code <= 99) {
+    return { text: "Thunderstorm", icon: "fa-cloud-bolt", animation: "glow-pulse 0.8s infinite alternate" };
+  } else {
+    return { text: "Cloudy / Overcast", icon: "fa-cloud", animation: "none" };
+  }
 }
