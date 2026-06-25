@@ -805,4 +805,80 @@ body.theme-sunset-flare {
   --glow-blue: rgba(244, 63, 94, 0.15);
 }
 
+/* Virtual Storage Battery UI Styling */
+.battery-status-container {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 1.25rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 14px;
+}
+
+/* Vertical Battery Shell */
+.battery-body-visual {
+  position: relative;
+  width: 42px;
+  height: 72px;
+  border: 3px solid var(--text-dark);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.4);
+}
+
+.battery-cap-visual {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 6px;
+  background: var(--text-dark);
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.battery-fill-visual {
+  width: 100%;
+  background: linear-gradient(to top, #10b981, #22c55e);
+  border-radius: 4px;
+  transition: height 0.5s ease-out;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+/* Battery Metrics text panel */
+.battery-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.battery-metrics span:first-child {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+}
+
+.battery-metrics span:last-child {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* Icon adjustments */
+.icon-battery {
+  color: var(--color-green);
+  transition: all 0.3s ease;
+}
+
+.icon-battery.charging {
+  animation: glow-pulse 1.2s infinite alternate;
+}
+
 

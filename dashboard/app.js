@@ -29,6 +29,7 @@ const UTILITY_RATE_PER_KWH = 40.0; // Rs. per kWh unit
 let currentVoltageVal = 0.0;
 let currentLdrVal = 0;
 let currentWeatherCode = 0; // WMO Weather Code from Open-Meteo
+let batterySoC = parseFloat(localStorage.getItem("virtualBatterySoC")) || 75.0; // Simulated battery state
 
 let liveChart = null;
 
@@ -240,6 +241,9 @@ function setupRealtimeListeners() {
       const treesEquivalent = co2Avoided / 22.0;
       const treesDisplay = document.getElementById("val-trees");
       if (treesDisplay) treesDisplay.textContent = treesEquivalent.toFixed(4);
+
+      // Run Virtual Storage Battery SoC Simulation
+      updateBatterySimulation(power, elapsedHours);
 
       // Control flow bubble animation based on power output
       const chargingLine = document.getElementById("charging-line");
@@ -632,4 +636,66 @@ if (themeSelect) {
     document.body.className = selectedTheme;
     localStorage.setItem("selectedTheme", selectedTheme);
   });
+}
+
+// ==========================================
+// 11. Virtual Storage Battery Simulation
+// ==========================================
+function updateBatterySimulation(solarPower, elapsedHours) {
+  const socValEl = document.getElementById("val-battery-soc");
+  const fillEl = document.getElementById("pb-battery-fill");
+  const statusEl = document.getElementById("desc-battery-status");
+  const wattEl = document.getElementById("val-battery-net-watt");
+  const batteryIcon = document.getElementById("battery-charging-icon");
+
+  if (!socValEl || !fillEl) return;
+
+  // Determine smart appliance state
+  const isApplianceOn = document.getElementById("btn-toggle-relay") ? document.getElementById("btn-toggle-relay").checked : false;
+
+  // Appliance consumes virtual 20W, background system consumes 2W standby
+  const loadConsumption = isApplianceOn ? 20.0 : 0.0;
+  const standbyConsumption = 2.0;
+  const netPower = solarPower - loadConsumption - standbyConsumption;
+
+  // Battery capacity: 12V 100Ah = 1200Wh. Update SoC
+  const deltaSoC = (netPower * elapsedHours / 1200.0) * 100.0;
+  batterySoC = Math.min(Math.max(batterySoC + deltaSoC, 0.0), 100.0);
+  
+  // Persist State of Charge
+  localStorage.setItem("virtualBatterySoC", batterySoC);
+
+  // Update DOM elements
+  socValEl.textContent = batterySoC.toFixed(1);
+  fillEl.style.height = `${batterySoC}%`;
+
+  if (wattEl) {
+    const sign = netPower >= 0 ? "+" : "";
+    wattEl.textContent = `${sign}${netPower.toFixed(1)}W`;
+  }
+
+  if (statusEl) {
+    if (netPower > 0.0) {
+      statusEl.textContent = "Charging via Solar";
+      statusEl.style.color = "var(--color-green)";
+      if (batteryIcon) {
+        batteryIcon.className = "fa-solid fa-battery-charging icon-battery charging";
+      }
+    } else {
+      statusEl.textContent = isApplianceOn ? "Discharging (Load Active)" : "Discharging (Standby)";
+      statusEl.style.color = isApplianceOn ? "var(--color-orange)" : "var(--text-secondary)";
+      if (batteryIcon) {
+        if (batterySoC > 80.0) {
+          batteryIcon.className = "fa-solid fa-battery-full icon-battery";
+        } else if (batterySoC > 50.0) {
+          batteryIcon.className = "fa-solid fa-battery-three-quarters icon-battery";
+        } else if (batterySoC > 20.0) {
+          batteryIcon.className = "fa-solid fa-battery-half icon-battery";
+        } else {
+          batteryIcon.className = "fa-solid fa-battery-empty icon-battery";
+        }
+        batteryIcon.style.animation = "none";
+      }
+    }
+  }
 }
