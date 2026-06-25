@@ -448,3 +448,130 @@ body {
     filter: drop-shadow(0 0 10px var(--color-cyan));
   }
 }
+
+/* ==========================================================================
+   Innovative Additions: Energy Analytics, Savings & Live Charts
+   ========================================================================== */
+
+/* Full-width Card Spanning */
+.card-full {
+  grid-column: span 1;
+}
+
+@media (min-width: 900px) {
+  .card-full {
+    grid-column: span 3;
+  }
+}
+
+/* Energy Analytics & Cost Savings Grid */
+.analytics-metrics {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.metric-box {
+  flex: 1;
+  min-width: 130px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 1rem;
+  border-radius: 14px;
+}
+
+.metric-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.5px;
+}
+
+.metric-value {
+  display: flex;
+  align-items: baseline;
+  gap: 0.2rem;
+}
+
+.metric-value span:first-child {
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.sub-unit {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.savings-highlight {
+  color: var(--color-green);
+  text-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
+}
+
+.currency-symbol {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-right: 0.15rem;
+  color: var(--color-green);
+}
+
+/* Diagnostic Box and Alerts */
+.efficiency-alert-box {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 14px;
+  padding: 1rem;
+  border-left: 4px solid var(--text-dark);
+  transition: all 0.3s ease;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 0.3rem;
+}
+
+.alert-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  background-color: var(--text-dark);
+  box-shadow: 0 0 5px var(--text-dark);
+}
+
+.alert-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Chart Canvas Wrapper */
+.chart-wrapper {
+  position: relative;
+  height: 250px;
+  width: 100%;
+  margin-top: 1.25rem;
+}
+
+/* Color codes for Icons */
+.icon-chart {
+  color: var(--color-cyan);
+  filter: drop-shadow(0 0 5px rgba(34, 211, 238, 0.3));
+}
+
+.icon-savings {
+  color: var(--color-green);
+  filter: drop-shadow(0 0 5px rgba(16, 185, 129, 0.3));
+}
+

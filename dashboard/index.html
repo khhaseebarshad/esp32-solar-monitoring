@@ -177,6 +177,56 @@
         </div>
       </div>
 
+      <!-- Card 7: Energy Analytics & Efficiency (Innovative Software Cards) -->
+      <div class="card card-wide savings-card">
+        <div class="card-content">
+          <div class="card-header">
+            <h3>Energy Analytics & Panel Cleanliness</h3>
+            <i class="fa-solid fa-seedling icon-savings"></i>
+          </div>
+          
+          <div class="analytics-metrics">
+            <div class="metric-box">
+              <span class="metric-title">Total Energy Gen</span>
+              <div class="metric-value">
+                <span id="val-energy">0.000</span>
+                <span class="sub-unit">Wh</span>
+              </div>
+            </div>
+            
+            <div class="metric-box">
+              <span class="metric-title">Estimated Cost Savings</span>
+              <div class="metric-value savings-highlight">
+                <span class="currency-symbol">Rs.</span>
+                <span id="val-savings">0.00</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="efficiency-alert-box" id="efficiency-box">
+            <div class="status-indicator">
+              <span class="alert-dot" id="eff-dot"></span>
+              <span id="eff-status">Initializing Diagnostics...</span>
+            </div>
+            <p class="alert-desc" id="eff-desc">Comparing sunlight (LDR) vs actual panel generation.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 8: Live Trend Analytics Chart (Full-Width) -->
+      <div class="card card-full chart-card">
+        <div class="card-content">
+          <div class="card-header">
+            <h3>Live Power & Voltage Trends</h3>
+            <i class="fa-solid fa-chart-line icon-chart"></i>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="liveTrendChart"></canvas>
+          </div>
+          <p class="card-desc">Dynamic chart plotting the last 15 telemetry values.</p>
+        </div>
+      </div>
+
     </main>
     
     <!-- Footer -->
@@ -185,6 +235,8 @@
     </footer>
   </div>
 
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- Local Script -->
   <script src="app.js"></script>
 </body>
