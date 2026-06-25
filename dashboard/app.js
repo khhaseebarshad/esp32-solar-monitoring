@@ -616,3 +616,20 @@ function updateSolarAdvisor() {
     }
   }
 }
+
+// ==========================================
+// 10. Multi-Theme Switching Logic
+// ==========================================
+const themeSelect = document.getElementById("theme-select");
+if (themeSelect) {
+  // Load saved theme
+  const savedTheme = localStorage.getItem("selectedTheme") || "theme-cyber-dark";
+  themeSelect.value = savedTheme;
+  document.body.className = savedTheme;
+
+  themeSelect.addEventListener("change", (e) => {
+    const selectedTheme = e.target.value;
+    document.body.className = selectedTheme;
+    localStorage.setItem("selectedTheme", selectedTheme);
+  });
+}
