@@ -28,6 +28,7 @@ const UTILITY_RATE_PER_KWH = 40.0; // Rs. per kWh unit
 
 let currentVoltageVal = 0.0;
 let currentLdrVal = 0;
+let currentWeatherCode = 0; // WMO Weather Code from Open-Meteo
 
 let liveChart = null;
 
@@ -271,6 +272,7 @@ function setupRealtimeListeners() {
 
     // Run Diagnostics
     runDiagnostics();
+    updateSolarAdvisor(); // Update load advisor on telemetry changes
   });
 
   // B. Monitor Environmental Data node
@@ -509,6 +511,8 @@ function getWeatherData(lat, lon, cityName) {
         const temp = data.current.temperature_2m;
         const hum = data.current.relative_humidity_2m;
         const code = data.current.weather_code;
+        currentWeatherCode = code; // Save weather code globally
+        updateSolarAdvisor();      // Update load advisor on weather update
         
         const tempEl = document.getElementById("val-outside-temp");
         const humEl = document.getElementById("val-outside-hum");
@@ -557,5 +561,58 @@ function mapWeatherCode(code) {
     return { text: "Thunderstorm", icon: "fa-cloud-bolt", animation: "glow-pulse 0.8s infinite alternate" };
   } else {
     return { text: "Cloudy / Overcast", icon: "fa-cloud", animation: "none" };
+  }
+}
+
+// ==========================================
+// 9. Intelligent Solar Load Advisor
+// ==========================================
+function updateSolarAdvisor() {
+  const statusEl = document.getElementById("val-advisor-status");
+  const recEl = document.getElementById("desc-advisor-recommendation");
+  const iconEl = document.getElementById("advisor-icon");
+
+  if (!statusEl || !recEl) return;
+
+  const powerText = document.getElementById("val-power") ? document.getElementById("val-power").textContent : "0.0";
+  const power = parseFloat(powerText) || 0.0;
+  const ldr = currentLdrVal;
+
+  // Decide scenario based on weather code and current telemetry
+  const isStormyOrRainy = currentWeatherCode >= 51;
+  const isCloudyOrFoggy = (currentWeatherCode >= 1 && currentWeatherCode <= 48) || (currentWeatherCode >= 80 && currentWeatherCode <= 82);
+
+  if (isStormyOrRainy) {
+    statusEl.textContent = "Grid Recommended";
+    statusEl.style.color = "var(--color-red)";
+    recEl.textContent = "Rain/storm forecasted. Solar yield restricted. Run high-power loads on grid to protect backup batteries.";
+    if (iconEl) {
+      iconEl.className = "fa-solid fa-cloud-bolt icon-advisor";
+      iconEl.style.animation = "pulse 1.5s infinite alternate";
+    }
+  } else if (power < 0.25 && ldr < 400) {
+    statusEl.textContent = "Standby (Night)";
+    statusEl.style.color = "var(--text-dark)";
+    recEl.textContent = "Sunset detected. System is in standby mode. Batteries are on normal discharge cycle.";
+    if (iconEl) {
+      iconEl.className = "fa-solid fa-moon icon-advisor";
+      iconEl.style.animation = "none";
+    }
+  } else if (isCloudyOrFoggy || (power < 1.0 && ldr < 1500)) {
+    statusEl.textContent = "Moderate Yield";
+    statusEl.style.color = "var(--color-orange)";
+    recEl.textContent = "Cloudy skies or moderate sun. Battery charging active. Limit high-wattage appliance runs on solar.";
+    if (iconEl) {
+      iconEl.className = "fa-solid fa-cloud-sun icon-advisor";
+      iconEl.style.animation = "none";
+    }
+  } else {
+    statusEl.textContent = "Optimal Yield";
+    statusEl.style.color = "var(--color-green)";
+    recEl.textContent = "Peak sunshine & clear skies. Highly optimal conditions! Switch heavy appliances (pumps, AC) to solar.";
+    if (iconEl) {
+      iconEl.className = "fa-solid fa-brain icon-advisor";
+      iconEl.style.animation = "glow-pulse 1.5s infinite alternate";
+    }
   }
 }
