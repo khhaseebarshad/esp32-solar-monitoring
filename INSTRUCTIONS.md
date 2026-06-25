@@ -123,3 +123,27 @@ Firebase Upload Cycle Completed.
 * **`Signup Error: ...`**
   * **Cause:** Anonymous authentication is disabled in Firebase Authentication.
   * **Solution:** Enable Anonymous auth in the Firebase Console. Check if the ESP32 has internet access.
+
+---
+
+## 6. Interactive Smart Switch (IoT Appliance Control)
+
+The ESP32 is configured to listen to the path `/Control/Relay` on Firebase Realtime Database using a real-time data stream listener.
+
+### How it works:
+1. When you toggle the switch on the web dashboard (e.g. at `https://dashboard-two-neon-97.vercel.app`), the web client updates the value at `/Control/Relay` to `true` or `false`.
+2. The ESP32's background stream callback is immediately triggered.
+3. The onboard blue LED on **GPIO 2** (defined as `RELAY_PIN`) is set to `HIGH` (ON) or `LOW` (OFF) instantly.
+
+### Verification Steps:
+1. Make sure your ESP32 is powered and connected to the same Firebase Realtime Database.
+2. Open the web dashboard.
+3. Locate the **Smart Appliance** card.
+4. Toggle the switch. You will see the status change from "Appliance: OFF" to "Appliance: ON" and the bulb icon glowing.
+5. In the Serial Monitor, you will see output like:
+   ```text
+   [Firebase Stream] Path: /Control/Relay, Event: / , Type: boolean
+   [Firebase Stream] Relay GPIO 2 set to: ON
+   ```
+6. The onboard blue LED on the ESP32 will turn ON/OFF dynamically.
+
