@@ -334,9 +334,43 @@ function setupRealtimeListeners() {
       }
     }
 
-    // Run Diagnostics
-    runDiagnostics();
   });
+
+  // C. Monitor Smart Appliance Switch control node
+  database.ref("/Control/Relay").on("value", (snapshot) => {
+    const isChecked = snapshot.val() === true;
+    const toggleBtn = document.getElementById("btn-toggle-relay");
+    const statusText = document.getElementById("appliance-status");
+    const bulbIcon = document.getElementById("appliance-bulb-icon");
+
+    if (toggleBtn) toggleBtn.checked = isChecked;
+    if (statusText && bulbIcon) {
+      if (isChecked) {
+        statusText.textContent = "Appliance: ON";
+        statusText.classList.add("active");
+        bulbIcon.classList.add("active");
+      } else {
+        statusText.textContent = "Appliance: OFF";
+        statusText.classList.remove("active");
+        bulbIcon.classList.remove("active");
+      }
+    }
+  });
+
+  // Handle user interaction with the toggle switch
+  const toggleBtn = document.getElementById("btn-toggle-relay");
+  if (toggleBtn) {
+    toggleBtn.addEventListener("change", (e) => {
+      const isChecked = e.target.checked;
+      database.ref("/Control/Relay").set(isChecked)
+        .then(() => {
+          console.log("[Firebase] Appliance Relay state set to:", isChecked);
+        })
+        .catch((err) => {
+          console.error("[Firebase] Appliance Relay toggle write failed:", err);
+        });
+    });
+  }
 }
 
 // ==========================================

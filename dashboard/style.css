@@ -575,3 +575,86 @@ body {
   filter: drop-shadow(0 0 5px rgba(16, 185, 129, 0.3));
 }
 
+/* Smart Control Switch Container & Layout */
+.control-switch-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1.25rem 0;
+}
+
+.control-status {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  transition: color 0.3s ease;
+}
+
+.control-status.active {
+  color: var(--color-yellow);
+  text-shadow: 0 0 10px rgba(234, 179, 8, 0.2);
+}
+
+.icon-control {
+  color: var(--text-dark);
+  transition: all 0.3s ease;
+}
+
+.icon-control.active {
+  color: var(--color-yellow);
+  filter: drop-shadow(0 0 10px var(--color-yellow));
+}
+
+/* Premium iOS Style Toggle Switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 64px;
+  height: 36px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #1e293b;
+  border: 1px solid var(--glass-border);
+  transition: .4s;
+  border-radius: 36px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 28px;
+  width: 28px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #f1f5f9;
+  transition: .4s;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+input:checked + .slider {
+  background-color: var(--color-yellow);
+  box-shadow: 0 0 15px rgba(234, 179, 8, 0.4);
+}
+
+input:checked + .slider:before {
+  transform: translateX(28px);
+}
+
+
