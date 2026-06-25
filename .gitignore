@@ -1,0 +1,12 @@
+# Vercel Configuration
+.vercel/
+
+# Local Build Directories
+build/
+bin/
+
+# Temporary Files
+*.log
+*.tmp
+.DS_Store
+Thumbs.db

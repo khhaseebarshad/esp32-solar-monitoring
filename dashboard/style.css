@@ -1,0 +1,450 @@
+/* ==========================================================================
+   Design System Variables & Core Layout
+   ========================================================================== */
+:root {
+  --font-family: 'Outfit', sans-serif;
+  
+  /* Color Palette */
+  --bg-dark: #070a13;
+  --bg-gradient: radial-gradient(circle at 50% 0%, #101626 0%, #060911 100%);
+  
+  --glass-bg: rgba(16, 22, 38, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-border-hover: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-dark: #64748b;
+  
+  /* Glowing Accents */
+  --glow-cyan: rgba(34, 211, 238, 0.15);
+  --color-cyan: #22d3ee;
+  
+  --glow-orange: rgba(249, 115, 22, 0.15);
+  --color-orange: #f97316;
+  
+  --glow-blue: rgba(59, 130, 246, 0.15);
+  --color-blue: #3b82f6;
+  
+  --glow-red: rgba(239, 68, 68, 0.15);
+  --color-red: #ef4444;
+
+  --glow-green: rgba(16, 185, 129, 0.15);
+  --color-green: #10b981;
+
+  --glow-yellow: rgba(234, 179, 8, 0.15);
+  --color-yellow: #eab308;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background: var(--bg-dark);
+  background-image: var(--bg-gradient);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+
+.dashboard-container {
+  width: 100%;
+  max-width: 1200px;
+  padding: 2.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+/* ==========================================================================
+   Header Section
+   ========================================================================== */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.panel-icon {
+  font-size: 2.75rem;
+  color: var(--color-cyan);
+  filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.5));
+}
+
+.header-title h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #ffffff 0%, var(--text-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.header-title p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+/* Status Panels */
+.status-panel {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.status-item {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  padding: 0.6rem 1.2rem;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(12px);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.status-dot.online {
+  background-color: var(--color-green);
+  color: var(--color-green);
+  box-shadow: 0 0 10px var(--color-green);
+  animation: pulse 1.5s infinite alternate;
+}
+
+.status-dot.offline {
+  background-color: var(--color-red);
+  color: var(--color-red);
+  box-shadow: 0 0 10px var(--color-red);
+  animation: pulse 1.5s infinite alternate;
+}
+
+.spinner {
+  color: var(--color-cyan);
+}
+
+.spinner.active {
+  animation: spin 1s linear infinite;
+}
+
+/* ==========================================================================
+   Dashboard Cards Grid
+   ========================================================================== */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  border-color: var(--glass-border-hover);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+}
+
+.card-wide {
+  grid-column: span 1;
+}
+
+@media (min-width: 900px) {
+  .card-wide {
+    grid-column: span 2;
+  }
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.card-header h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+}
+
+.card-header i {
+  font-size: 1.25rem;
+}
+
+/* Value Displays */
+.value-display {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: 0.75rem 0;
+}
+
+.value-display span:first-child {
+  font-size: 2.75rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.unit {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.card-desc {
+  font-size: 0.8rem;
+  color: var(--text-dark);
+  margin-top: 0.5rem;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  padding-top: 0.75rem;
+}
+
+/* ==========================================================================
+   Primary Power Card Highlights
+   ========================================================================== */
+.power-card {
+  border-left: 3px solid var(--color-cyan);
+  box-shadow: inset 0 0 30px rgba(34, 211, 238, 0.05), var(--glass-shadow);
+}
+
+.power-card .value-display span:first-child {
+  font-size: 4rem;
+  color: var(--color-cyan);
+  text-shadow: 0 0 20px rgba(34, 211, 238, 0.35);
+}
+
+.icon-power {
+  color: var(--color-cyan);
+  filter: drop-shadow(0 0 5px var(--color-cyan));
+  animation: glow-pulse 2s infinite alternate;
+}
+
+/* Charging Stream Animation */
+.charging-indicator {
+  height: 4px;
+  background: rgba(34, 211, 238, 0.1);
+  border-radius: 10px;
+  margin-top: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.charging-indicator .bubble {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 30px;
+  background: linear-gradient(90deg, transparent, var(--color-cyan), transparent);
+  animation: flow-right 1.8s infinite linear;
+  opacity: 0;
+}
+
+.charging-indicator .bubble-1 { animation-delay: 0s; }
+.charging-indicator .bubble-2 { animation-delay: 0.6s; }
+.charging-indicator .bubble-3 { animation-delay: 1.2s; }
+
+/* ==========================================================================
+   Individual Gauge Styles
+   ========================================================================== */
+
+/* Progress Bars (Voltage / Current) */
+.progress-bar-container {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.5s ease-out;
+}
+
+#pb-voltage {
+  background: linear-gradient(90deg, #fdba74, var(--color-orange));
+  box-shadow: 0 0 8px rgba(249, 115, 22, 0.4);
+}
+
+#pb-current {
+  background: linear-gradient(90deg, #60a5fa, var(--color-blue));
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+}
+
+.icon-voltage { color: var(--color-orange); }
+.icon-current { color: var(--color-blue); }
+
+/* Circular Progress for Humidity */
+.circular-progress {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto;
+}
+
+.progress-ring-circle {
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  transition: stroke-dashoffset 0.5s ease-out;
+}
+
+.circular-value {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-blue);
+}
+
+.icon-hum { color: var(--color-blue); }
+
+/* Temperature Column Indicator */
+.icon-temp { color: var(--color-red); }
+
+.temp-indicator-bar {
+  width: 8px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  position: absolute;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.temp-fill {
+  width: 100%;
+  background: linear-gradient(to top, #f87171, var(--color-red));
+  border-radius: 10px;
+  transition: height 0.5s ease-out;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+/* LDR Sunlight Level */
+.icon-ldr {
+  color: var(--color-yellow);
+  transition: transform 0.5s ease;
+}
+
+.ldr-display-level {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.ldr-level-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #fef08a, var(--color-yellow));
+  box-shadow: 0 0 8px rgba(234, 179, 8, 0.4);
+  transition: width 0.5s ease-out;
+}
+
+/* ==========================================================================
+   Footer Section
+   ========================================================================== */
+.dashboard-footer {
+  text-align: center;
+  border-top: 1px solid var(--glass-border);
+  padding-top: 1.5rem;
+  font-size: 0.8rem;
+  color: var(--text-dark);
+  margin-top: auto;
+}
+
+/* ==========================================================================
+   Keyframes and Animations
+   ========================================================================== */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+@keyframes flow-right {
+  0% {
+    left: -30px;
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes glow-pulse {
+  0% {
+    filter: drop-shadow(0 0 2px var(--color-cyan));
+  }
+  100% {
+    filter: drop-shadow(0 0 10px var(--color-cyan));
+  }
+}

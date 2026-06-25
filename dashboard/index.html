@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solar Energy Monitoring System - Real-time Dashboard</title>
+  
+  <!-- Google Fonts: Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons for Sensors -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  
+  <!-- Local Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Firebase SDK Compatibility Libraries (v10) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+  <div class="dashboard-container">
+    
+    <!-- Header -->
+    <header class="dashboard-header">
+      <div class="header-title">
+        <i class="fa-solid fa-solar-panel panel-icon"></i>
+        <div>
+          <h1>Solar Energy Monitor</h1>
+          <p>ESP32 & Firebase Real-time Telemetry Dashboard</p>
+        </div>
+      </div>
+      
+      <!-- Real-time Status Panel -->
+      <div class="status-panel">
+        <div class="status-item" id="connection-status">
+          <span class="status-dot offline"></span>
+          <span class="status-text">Connecting to Firebase...</span>
+        </div>
+        <div class="status-item" id="sync-status">
+          <i class="fa-solid fa-arrows-rotate spinner"></i>
+          <span class="sync-text">Syncing...</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Grid -->
+    <main class="dashboard-grid">
+      
+      <!-- Card 1: Power Output (Primary Highlight) -->
+      <div class="card card-wide power-card">
+        <div class="card-glow"></div>
+        <div class="card-content">
+          <div class="card-header">
+            <h3>Solar Power Output</h3>
+            <i class="fa-solid fa-bolt icon-power"></i>
+          </div>
+          <div class="value-display">
+            <span id="val-power">0.00</span>
+            <span class="unit">Watts</span>
+          </div>
+          <p class="card-desc">Real-time Solar Generation ($P = V \times I$)</p>
+          <div class="charging-indicator" id="charging-line">
+            <span class="bubble bubble-1"></span>
+            <span class="bubble bubble-2"></span>
+            <span class="bubble bubble-3"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Voltage -->
+      <div class="card sensor-card" id="card-voltage">
+        <div class="card-content">
+          <div class="card-header">
+            <h3>Solar Voltage</h3>
+            <i class="fa-solid fa-gauge-high icon-voltage"></i>
+          </div>
+          <div class="value-display">
+            <span id="val-voltage">0.0</span>
+            <span class="unit">Volts</span>
+          </div>
+          <!-- Custom Visual Progress Arc / Line -->
+          <div class="progress-bar-container">
+            <div class="progress-bar" id="pb-voltage" style="width: 0%"></div>
+          </div>
+          <div class="card-footer">
+            <span>Range: 0V - 25V</span>
+            <span id="percent-voltage">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Current -->
+      <div class="card sensor-card" id="card-current">
+        <div class="card-content">
+          <div class="card-header">
+            <h3>Solar Current</h3>
+            <i class="fa-solid fa-circle-nodes icon-current"></i>
+          </div>
+          <div class="value-display">
+            <span id="val-current">0.00</span>
+            <span class="unit">Amps</span>
+          </div>
+          <!-- Custom Visual Progress Arc / Line -->
+          <div class="progress-bar-container">
+            <div class="progress-bar" id="pb-current" style="width: 0%"></div>
+          </div>
+          <div class="card-footer">
+            <span>Range: 0A - 5A</span>
+            <span id="percent-current">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4: Temperature -->
+      <div class="card sensor-card" id="card-temp">
+        <div class="card-content">
+          <div class="card-header">
+            <h3>Temperature</h3>
+            <i class="fa-solid fa-temperature-half icon-temp"></i>
+          </div>
+          <div class="value-display">
+            <span id="val-temp">--.-</span>
+            <span class="unit">°C</span>
+          </div>
+          <div class="temp-indicator-bar">
+            <div class="temp-fill" id="fill-temp" style="height: 0%"></div>
+          </div>
+          <p class="card-desc" id="desc-temp">Reading DHT11...</p>
+        </div>
+      </div>
+
+      <!-- Card 5: Humidity -->
+      <div class="card sensor-card" id="card-hum">
+        <div class="card-content">
+          <div class="card-header">
+            <h3>Humidity</h3>
+            <i class="fa-solid fa-droplet icon-hum"></i>
+          </div>
+          <div class="value-display">
+            <span id="val-hum">--</span>
+            <span class="unit">%</span>
+          </div>
+          <!-- Circular Ring / Progress Arc -->
+          <div class="circular-progress">
+            <svg class="progress-ring" width="80" height="80">
+              <circle class="progress-ring-circle-bg" stroke="#1e293b" stroke-width="6" fill="transparent" r="34" cx="40" cy="40"/>
+              <circle class="progress-ring-circle" id="circle-hum" stroke="#38bdf8" stroke-width="6" fill="transparent" r="34" cx="40" cy="40" stroke-dasharray="213.6" stroke-dashoffset="213.6"/>
+            </svg>
+            <div class="circular-value" id="circle-val-hum">0%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 6: LDR / Ambient Light -->
+      <div class="card sensor-card" id="card-ldr">
+        <div class="card-content">
+          <div class="card-header">
+            <h3>Ambient Light</h3>
+            <i class="fa-solid fa-sun icon-ldr" id="ldr-sun-icon"></i>
+          </div>
+          <div class="value-display">
+            <span id="val-ldr">0</span>
+            <span class="unit">ADC</span>
+          </div>
+          <div class="ldr-display-level">
+            <div class="ldr-level-bar" id="level-ldr" style="width: 0%"></div>
+          </div>
+          <div class="card-footer">
+            <span id="desc-ldr">Offline</span>
+            <span id="percent-ldr">0%</span>
+          </div>
+        </div>
+      </div>
+
+    </main>
+    
+    <!-- Footer -->
+    <footer class="dashboard-footer">
+      <p>&copy; 2026 Solar Energy Monitoring System | Powered by ESP32, Firebase RTDB & OLED Display</p>
+    </footer>
+  </div>
+
+  <!-- Local Script -->
+  <script src="app.js"></script>
+</body>
+</html>
