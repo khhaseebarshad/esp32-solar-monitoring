@@ -690,4 +690,26 @@ input:checked + .slider:before {
   color: var(--color-cyan);
 }
 
+/* Green Impact highlights */
+.co2-highlight {
+  color: var(--color-blue);
+  text-shadow: 0 0 15px rgba(59, 130, 246, 0.25);
+}
+
+.trees-highlight {
+  color: var(--color-green);
+  text-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
+}
+
+/* Thermal health icon and progress bar */
+.icon-thermal {
+  color: var(--color-red);
+  filter: drop-shadow(0 0 5px rgba(239, 68, 68, 0.3));
+}
+
+#pb-thermal {
+  background: linear-gradient(90deg, #fb923c, var(--color-red));
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
 

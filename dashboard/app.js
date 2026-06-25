@@ -230,6 +230,16 @@ function setupRealtimeListeners() {
       const costSavings = totalKwh * UTILITY_RATE_PER_KWH;
       document.getElementById("val-savings").textContent = costSavings.toFixed(2);
 
+      // Calculate and display CO2 avoided (0.85 kg per kWh)
+      const co2Avoided = totalKwh * 0.85;
+      const co2Display = document.getElementById("val-co2");
+      if (co2Display) co2Display.textContent = co2Avoided.toFixed(3);
+
+      // Calculate and display Trees Equivalent (1 tree absorbs ~22kg/year)
+      const treesEquivalent = co2Avoided / 22.0;
+      const treesDisplay = document.getElementById("val-trees");
+      if (treesDisplay) treesDisplay.textContent = treesEquivalent.toFixed(4);
+
       // Control flow bubble animation based on power output
       const chargingLine = document.getElementById("charging-line");
       if (power > 0.05) {
@@ -271,7 +281,7 @@ function setupRealtimeListeners() {
 
     triggerSyncAnimation();
 
-    // 1. Temperature (DHT11)
+    // 1. Temperature (DHT11) & Thermal Loss Calculation
     if (data.Temperature !== undefined) {
       const temp = parseFloat(data.Temperature);
       document.getElementById("val-temp").textContent = temp.toFixed(1);
@@ -289,6 +299,36 @@ function setupRealtimeListeners() {
       } else {
         descEl.textContent = "High Heat Warning";
         descEl.style.color = "#ef4444";
+      }
+
+      // Calculate Solar PV Thermal Efficiency Loss (0.4% per °C above 25°C)
+      const thermalLoss = Math.max((temp - 25.0) * 0.4, 0.0);
+      const lossValEl = document.getElementById("val-thermal-loss");
+      if (lossValEl) lossValEl.textContent = thermalLoss.toFixed(1);
+
+      const pbThermal = document.getElementById("pb-thermal");
+      if (pbThermal) {
+        // Scale visually 0% - 15% range for progress bar width
+        const lossPercent = Math.min((thermalLoss / 15.0) * 100, 100);
+        pbThermal.style.width = `${lossPercent}%`;
+      }
+
+      const descThermal = document.getElementById("desc-thermal");
+      const thermalIcon = document.getElementById("thermal-icon");
+      if (descThermal) {
+        if (temp <= 25.0) {
+          descThermal.textContent = "Optimal panel temp. 0% heat loss.";
+          descThermal.style.color = "#10b981";
+          if (thermalIcon) thermalIcon.style.animation = "none";
+        } else if (temp <= 35.0) {
+          descThermal.textContent = `Mild loss. Panel temp is ${temp.toFixed(1)}°C.`;
+          descThermal.style.color = "#f97316";
+          if (thermalIcon) thermalIcon.style.animation = "glow-pulse 2s infinite alternate";
+        } else {
+          descThermal.textContent = "High heat! Panel efficiency reduced.";
+          descThermal.style.color = "#ef4444";
+          if (thermalIcon) thermalIcon.style.animation = "glow-pulse 0.8s infinite alternate";
+        }
       }
     }
 

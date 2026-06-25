@@ -202,7 +202,25 @@
         </div>
       </div>
 
-      <!-- Card 7: Smart IoT Appliance Control (New Feature) -->
+      <!-- Card 8: Solar Thermal Health & Efficiency Loss -->
+      <div class="card sensor-card" id="card-thermal">
+        <div class="card-content">
+          <div class="card-header">
+            <h3>Thermal Panel Health</h3>
+            <i class="fa-solid fa-fire-flame-curved icon-thermal" id="thermal-icon"></i>
+          </div>
+          <div class="value-display">
+            <span id="val-thermal-loss">0.0</span>
+            <span class="unit">% Loss</span>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar" id="pb-thermal" style="width: 0%"></div>
+          </div>
+          <p class="card-desc" id="desc-thermal">Loss due to panel temp rise above standard 25°C.</p>
+        </div>
+      </div>
+
+      <!-- Card 9: Smart IoT Appliance Control (New Feature) -->
       <div class="card sensor-card" id="card-control">
         <div class="card-content">
           <div class="card-header">
@@ -242,6 +260,22 @@
               <div class="metric-value savings-highlight">
                 <span class="currency-symbol">Rs.</span>
                 <span id="val-savings">0.00</span>
+              </div>
+            </div>
+
+            <div class="metric-box">
+              <span class="metric-title">CO2 Avoided</span>
+              <div class="metric-value co2-highlight">
+                <span id="val-co2">0.00</span>
+                <span class="sub-unit">kg</span>
+              </div>
+            </div>
+
+            <div class="metric-box">
+              <span class="metric-title">Green Impact</span>
+              <div class="metric-value trees-highlight">
+                <span id="val-trees">0.000</span>
+                <span class="sub-unit">Trees</span>
               </div>
             </div>
           </div>
