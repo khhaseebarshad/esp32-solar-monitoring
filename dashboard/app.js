@@ -388,43 +388,7 @@ function setupRealtimeListeners() {
 
   });
 
-  // C. Monitor Smart Appliance Switch control node
-  database.ref("/Control/Relay").on("value", (snapshot) => {
-    const isChecked = snapshot.val() === true;
-    const toggleBtn = document.getElementById("btn-toggle-relay");
-    const statusText = document.getElementById("appliance-status");
-    const bulbIcon = document.getElementById("appliance-bulb-icon");
 
-    if (toggleBtn) toggleBtn.checked = isChecked;
-    if (statusText && bulbIcon) {
-      if (isChecked) {
-        statusText.textContent = "Appliance: ON";
-        statusText.classList.add("active");
-        bulbIcon.classList.add("active");
-      } else {
-        statusText.textContent = "Appliance: OFF";
-        statusText.classList.remove("active");
-        bulbIcon.classList.remove("active");
-      }
-    }
-    // Update battery simulation immediately on switch state change
-    updateBatterySimulation();
-  });
-
-  // Handle user interaction with the toggle switch
-  const toggleBtn = document.getElementById("btn-toggle-relay");
-  if (toggleBtn) {
-    toggleBtn.addEventListener("change", (e) => {
-      const isChecked = e.target.checked;
-      database.ref("/Control/Relay").set(isChecked)
-        .then(() => {
-          console.log("[Firebase] Appliance Relay state set to:", isChecked);
-        })
-        .catch((err) => {
-          console.error("[Firebase] Appliance Relay toggle write failed:", err);
-        });
-    });
-  }
 }
 
 // ==========================================
@@ -661,13 +625,9 @@ function updateBatterySimulation() {
   const elapsedHours = (now - lastBatteryUpdateTime) / 3600000.0;
   lastBatteryUpdateTime = now;
 
-  // Determine smart appliance state
-  const isApplianceOn = document.getElementById("btn-toggle-relay") ? document.getElementById("btn-toggle-relay").checked : false;
-
-  // Appliance consumes virtual 20W, background system consumes 2W standby
-  const loadConsumption = isApplianceOn ? 20.0 : 0.0;
+  // Standby consumption (2W background system draw)
   const standbyConsumption = 2.0;
-  const netPower = currentSolarPower - loadConsumption - standbyConsumption;
+  const netPower = currentSolarPower - standbyConsumption;
 
   // Battery capacity: 12V 100Ah = 1200Wh. Update SoC
   const deltaSoC = (netPower * elapsedHours / 1200.0) * 100.0;
@@ -693,8 +653,8 @@ function updateBatterySimulation() {
         batteryIcon.className = "fa-solid fa-battery-charging icon-battery charging";
       }
     } else {
-      statusEl.textContent = isApplianceOn ? "Discharging (Load Active)" : "Discharging (Standby)";
-      statusEl.style.color = isApplianceOn ? "var(--color-orange)" : "var(--text-secondary)";
+      statusEl.textContent = "Discharging (Standby)";
+      statusEl.style.color = "var(--text-secondary)";
       if (batteryIcon) {
         if (batterySoC > 80.0) {
           batteryIcon.className = "fa-solid fa-battery-full icon-battery";

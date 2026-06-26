@@ -56,8 +56,6 @@ DHT dht(DHTPIN, DHTTYPE);
 #define CURRENT_PIN 35
 #define LDR_PIN 32
 
-// Digital Pins for Control (Smart Switch)
-#define RELAY_PIN 2
 
 // ESP32 ADC & Sensor Calibration Parameters
 const float ADC_REF_VOLTAGE = 3.3;       // ESP32 ADC Reference Voltage (normally 3.3V)
@@ -76,7 +74,6 @@ const float ACS_ZERO_OFFSET_VOLTS = 2.5; // Offset at 0 Amps (Vcc/2, where Vcc =
 // 3. Global Variables and Timer Intervals
 // ==========================================
 FirebaseData fbdo;
-FirebaseData fbdoStream;
 FirebaseAuth auth;
 FirebaseConfig config;
 
@@ -97,31 +94,6 @@ float hum = 0.0;
 int ldrValue = 0;
 bool dhtValid = false;
 
-// ==========================================
-// Stream Callback Functions
-// ==========================================
-void streamCallback(FirebaseStream data) {
-  Serial.printf("\n[Firebase Stream] Path: %s, Event: %s, Type: %s\n", 
-                data.streamPath().c_str(), 
-                data.dataPath().c_str(), 
-                data.dataType().c_str());
-  
-  if (data.dataTypeEnum() == firebase_rtdb_data_type_boolean) {
-    bool relayState = data.boolData();
-    digitalWrite(RELAY_PIN, relayState ? HIGH : LOW);
-    Serial.printf("[Firebase Stream] Relay GPIO %d set to: %s\n", RELAY_PIN, relayState ? "ON" : "OFF");
-  } else if (data.dataTypeEnum() == firebase_rtdb_data_type_integer) {
-    int val = data.intData();
-    digitalWrite(RELAY_PIN, val > 0 ? HIGH : LOW);
-    Serial.printf("[Firebase Stream] Relay GPIO %d set to: %s (int value)\n", RELAY_PIN, val > 0 ? "ON" : "OFF");
-  }
-}
-
-void streamTimeoutCallback(bool timeout) {
-  if (timeout) {
-    Serial.println("[Firebase Stream] Timeout, resuming connection...");
-  }
-}
 
 // ==========================================
 // 4. Setup Routine
@@ -201,17 +173,6 @@ void setup() {
   // Start Firebase Client Session
   Firebase.begin(&config, &auth);
 
-  // Initialize and start Firebase Realtime Database stream callback
-  pinMode(RELAY_PIN, OUTPUT);
-  digitalWrite(RELAY_PIN, LOW); // Start turned off
-
-  fbdoStream.keepAlive(5, 5, 1);
-  if (!Firebase.RTDB.beginStream(&fbdoStream, "/Control/Relay")) {
-    Serial.printf("[Firebase Stream] Begin stream failed: %s\n", fbdoStream.errorReason().c_str());
-  } else {
-    Firebase.RTDB.setStreamCallback(&fbdoStream, streamCallback, streamTimeoutCallback);
-    Serial.println("[Firebase Stream] Successfully subscribed to /Control/Relay");
-  }
 
   display.clearDisplay();
   display.setCursor(0, 20);
