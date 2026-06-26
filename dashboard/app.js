@@ -30,6 +30,8 @@ let currentVoltageVal = 0.0;
 let currentLdrVal = 0;
 let currentWeatherCode = 0; // WMO Weather Code from Open-Meteo
 let batterySoC = parseFloat(localStorage.getItem("virtualBatterySoC")) || 75.0; // Simulated battery state
+let currentSolarPower = 0.0; // Cached solar power for calculations
+let lastBatteryUpdateTime = Date.now(); // Separate timer for battery SoC
 
 let liveChart = null;
 
@@ -43,6 +45,7 @@ firebase.auth().signInAnonymously()
     setupRealtimeListeners();
     fetchOutsideWeather(); // Fetch outside weather on load
     setInterval(fetchOutsideWeather, 600000); // Refresh every 10 mins
+    updateBatterySimulation(); // Initial battery calculation
   })
   .catch((error) => {
     console.error("Firebase Anonymous Auth failed:", error);
@@ -203,6 +206,7 @@ function setupRealtimeListeners() {
     // 3. Solar Power & Energy Accumulator (Wh & Money Savings)
     if (data.Power !== undefined) {
       const power = parseFloat(data.Power);
+      currentSolarPower = power; // Save globally
       document.getElementById("val-power").textContent = power.toFixed(2);
       
       // Calculate elapsed hours since last database packet read
@@ -243,7 +247,7 @@ function setupRealtimeListeners() {
       if (treesDisplay) treesDisplay.textContent = treesEquivalent.toFixed(4);
 
       // Run Virtual Storage Battery SoC Simulation
-      updateBatterySimulation(power, elapsedHours);
+      updateBatterySimulation();
 
       // Control flow bubble animation based on power output
       const chargingLine = document.getElementById("charging-line");
@@ -403,6 +407,8 @@ function setupRealtimeListeners() {
         bulbIcon.classList.remove("active");
       }
     }
+    // Update battery simulation immediately on switch state change
+    updateBatterySimulation();
   });
 
   // Handle user interaction with the toggle switch
@@ -641,7 +647,7 @@ if (themeSelect) {
 // ==========================================
 // 11. Virtual Storage Battery Simulation
 // ==========================================
-function updateBatterySimulation(solarPower, elapsedHours) {
+function updateBatterySimulation() {
   const socValEl = document.getElementById("val-battery-soc");
   const fillEl = document.getElementById("pb-battery-fill");
   const statusEl = document.getElementById("desc-battery-status");
@@ -650,13 +656,18 @@ function updateBatterySimulation(solarPower, elapsedHours) {
 
   if (!socValEl || !fillEl) return;
 
+  // Calculate elapsed hours since last battery update
+  const now = Date.now();
+  const elapsedHours = (now - lastBatteryUpdateTime) / 3600000.0;
+  lastBatteryUpdateTime = now;
+
   // Determine smart appliance state
   const isApplianceOn = document.getElementById("btn-toggle-relay") ? document.getElementById("btn-toggle-relay").checked : false;
 
   // Appliance consumes virtual 20W, background system consumes 2W standby
   const loadConsumption = isApplianceOn ? 20.0 : 0.0;
   const standbyConsumption = 2.0;
-  const netPower = solarPower - loadConsumption - standbyConsumption;
+  const netPower = currentSolarPower - loadConsumption - standbyConsumption;
 
   // Battery capacity: 12V 100Ah = 1200Wh. Update SoC
   const deltaSoC = (netPower * elapsedHours / 1200.0) * 100.0;
